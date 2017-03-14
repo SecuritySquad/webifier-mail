@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
@@ -43,14 +42,14 @@ public class MailSendService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mailSender.createMimeMessage(), true, "utf-8");
             String message = String.join("\n", urlResults.entrySet().stream().map(entry -> entry.getKey() + " -> " + getResultText(entry.getValue().getResult())).collect(toList()));
-            String htmlMessage = IOUtils.toString(ClassLoader.getSystemResource("mail.html"), "utf-8").replace("_result_", generateHtmlList(urlResults));
+            String htmlMessage = IOUtils.toString(Thread.currentThread().getContextClassLoader().getResourceAsStream("mail.html"), "utf-8").replace("_result_", generateHtmlList(urlResults));
             helper.setText(message, htmlMessage);
             helper.setTo(mailData.getSendTo());
             helper.setSubject(getMailPrefix(urlResults) + mailData.getSubject());
             helper.setFrom(from);
             stream(WebifierTesterResult.values()).forEach(r -> {
                 try {
-                    helper.addInline(r.name(), new ClassPathResource(getResultImage(r), getSystemClassLoader()));
+                    helper.addInline(r.name(), new ClassPathResource(getResultImage(r), Thread.currentThread().getContextClassLoader()));
                 } catch (MessagingException e) {
                     e.printStackTrace();
                 }
