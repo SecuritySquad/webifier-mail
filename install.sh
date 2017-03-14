@@ -4,7 +4,7 @@ cd ..
 
 if [ -e persistent/application-mail.extension ]
 then
-    cat persistent/application-mail.extension >> webifier-mail/src/main/resources/application.properties
+    cp persistent/application-mail.extension webifier-mail/src/main/resources/application.properties
 fi
 
 cd webifier-mail
