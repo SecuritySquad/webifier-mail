@@ -35,7 +35,7 @@ public class MailSendService {
     }
 
     public void sendStartMail(MailData mailData, List<String> urls) {
-
+        // TODO send start mail
     }
 
     public void sendResultMail(MailData mailData, Map<String, WebifierOverallTesterResult> urlResults) {
@@ -44,7 +44,6 @@ public class MailSendService {
             MimeMessageHelper helper = new MimeMessageHelper(mailSender.createMimeMessage(), true, "utf-8");
             String message = String.join("\n", urlResults.entrySet().stream().map(entry -> entry.getKey() + " -> " + getResultText(entry.getValue().getResult())).collect(toList()));
             String htmlMessage = IOUtils.toString(ClassLoader.getSystemResource("mail.html"), "utf-8").replace("_result_", generateHtmlList(urlResults));
-            System.out.println(htmlMessage);
             helper.setText(message, htmlMessage);
             helper.setTo(mailData.getSendTo());
             helper.setSubject(getMailPrefix(urlResults) + mailData.getSubject());
@@ -102,12 +101,6 @@ public class MailSendService {
             default:
                 return resultData.getTestName();
         }
-    }
-
-    private List<WebifierTesterResult> reduceResultes(Map<String, WebifierOverallTesterResult> urlResults) {
-        List<WebifierTesterResult> results = urlResults.values().stream().map(WebifierOverallTesterResult::getResult).distinct().collect(toList());
-//        urlResults.values().forEach(r -> r.getTestResults().forEach(t -> results.add(t.get)));
-        return results;
     }
 
     private String getResultImage(WebifierTesterResult result) {
