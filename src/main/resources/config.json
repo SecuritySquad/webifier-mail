@@ -1,0 +1,7 @@
+{
+  "tester": {
+    "command": "java -jar webifier-tester-all-0.0.1-SNAPSHOT.jar -u #URL -i #ID -o JSON",
+    "timeout": 15,
+    "parallel": 1
+  }
+}
