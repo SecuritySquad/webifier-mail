@@ -5,7 +5,7 @@ package de.securitysquad.webifier.core.tester;
  */
 public interface WebifierTesterResultListener {
 
-    void onStarted(String id, String url);
+    void onQueued(String id, String url, int waitingPosition);
 
     void onFinished(String id, WebifierOverallTesterResult result);
 }

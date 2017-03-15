@@ -16,6 +16,7 @@ public class WebifierOverallTesterResult {
     public WebifierOverallTesterResult(String id) {
         this.id = id;
         this.testResults = new ArrayList<>();
+        this.result = WebifierTesterResult.UNDEFINED;
     }
 
     public String getId() {

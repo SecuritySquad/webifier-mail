@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Component
 public class WebifierTesterLauncher implements Runnable {
-    private static final int MAX_QUEUE_SIZE = 100;
+    private static final int MAX_QUEUE_SIZE = 10000;
 
     private final WebifierTesterConfig config;
     private final List<WebifierTester> queue;
@@ -51,8 +51,12 @@ public class WebifierTesterLauncher implements Runnable {
         }
         String id = UUID.randomUUID().toString();
         String command = config.getCommand().replace("#URL", url).replace("#ID", id);
-        queue.add(new WebifierTester(id, url, command, listener, config.getTimeout()));
+        queue.add(new WebifierTester(id, url, command, listener, config.getTimeout(), nextWaitingPosition()));
         return id;
+    }
+
+    private synchronized int nextWaitingPosition() {
+        return (int) (queue.stream().filter(t -> WAITING.equals(t.getState())).count() + 1);
     }
 
     @Override

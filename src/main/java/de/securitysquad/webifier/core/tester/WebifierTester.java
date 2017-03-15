@@ -27,7 +27,7 @@ public class WebifierTester {
     private WebifierOverallTesterResult result;
     private boolean finished;
 
-    public WebifierTester(String id, String url, String command, WebifierTesterResultListener listener, int timeoutInMinutes) {
+    public WebifierTester(String id, String url, String command, WebifierTesterResultListener listener, int timeoutInMinutes, int waitingPosition) {
         creationIndex = System.currentTimeMillis();
         Assert.notNull(id, "id must not be null!");
         Assert.notNull(url, "url must not be null!");
@@ -39,11 +39,11 @@ public class WebifierTester {
         this.timeoutInMinutes = timeoutInMinutes;
         result = new WebifierOverallTesterResult(id);
         state = WebifierTesterState.WAITING;
+        fireQueuedEvent(waitingPosition);
     }
 
     public void launch() {
         state = WebifierTesterState.RUNNING;
-        fireStartedEvent();
         testerThread = new Thread(() -> {
             try {
                 System.out.println(command);
@@ -124,9 +124,9 @@ public class WebifierTester {
         }
     }
 
-    private void fireStartedEvent() {
+    private void fireQueuedEvent(int waitingPosition) {
         if (listener != null)
-            listener.onStarted(id, url);
+            listener.onQueued(id, url, waitingPosition);
     }
 
     private void fireFinishedEventWithoutResult() {

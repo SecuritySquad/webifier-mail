@@ -3,11 +3,12 @@ package de.securitysquad.webifier.core.mail;
 import de.securitysquad.webifier.core.tester.WebifierOverallTesterResult;
 import de.securitysquad.webifier.core.tester.WebifierTesterResultListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Created by samuel on 08.03.17.
@@ -16,24 +17,22 @@ public class MailRequest implements WebifierTesterResultListener {
     private MailData mailData;
     private final MailSendService sendService;
     private final List<UrlWrapper> urls;
-    private long startTimestamp;
 
-    public MailRequest(MailData mailData, MailSendService sendService) {
+    public MailRequest(MailData mailData, List<String> urls, MailSendService sendService) {
         this.mailData = mailData;
         this.sendService = sendService;
-        urls = new ArrayList<>();
-        startTimestamp = System.currentTimeMillis();
+        this.urls = urls.stream().map(UrlWrapper::new).collect(toList());
     }
 
     @Override
-    public void onStarted(String id, String url) {
-        if (urls.isEmpty()) {
-            long executionTimestamp = System.currentTimeMillis();
-            if (executionTimestamp - startTimestamp > 5000) {
-                sendService.sendStartMail(mailData, urls.stream().map(UrlWrapper::getUrl).collect(Collectors.toList()));
-            }
+    public void onQueued(String id, String url, int waitingPosition) {
+        urls.stream().filter(w -> w.getUrl().equals(url)).findFirst().ifPresent(w -> {
+            w.setTesterId(id);
+            w.setWaitingPosition(waitingPosition);
+        });
+        if (urls.stream().allMatch(w -> w.getTesterId() != null)) {
+            sendService.sendStartMail(mailData, urls.stream().collect(toMap(UrlWrapper::getUrl, UrlWrapper::getWaitingPosition)));
         }
-        urls.add(new UrlWrapper(url, id));
     }
 
     @Override
@@ -49,16 +48,28 @@ public class MailRequest implements WebifierTesterResultListener {
 
     private class UrlWrapper {
         private String url;
+        private int waitingPosition;
         private String testerId;
         private WebifierOverallTesterResult result;
 
-        UrlWrapper(String url, String testerId) {
+        UrlWrapper(String url) {
             this.url = url;
-            this.testerId = testerId;
         }
 
         String getUrl() {
             return url;
+        }
+
+        public int getWaitingPosition() {
+            return waitingPosition;
+        }
+
+        public void setWaitingPosition(int waitingPosition) {
+            this.waitingPosition = waitingPosition;
+        }
+
+        public void setTesterId(String testerId) {
+            this.testerId = testerId;
         }
 
         String getTesterId() {

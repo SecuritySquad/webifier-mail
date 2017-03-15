@@ -31,6 +31,10 @@ public class MailConfig {
     @Bean
     public MailReceiver imapMailReceiver(@Value("imaps://${mail.receive.username}:${mail.receive.password}@${mail.receive.host}:${mail.receive.port}/inbox") String url) {
         Properties properties = new Properties();
+        properties.setProperty("mail.transport.protocol", "imaps");
+        properties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        properties.setProperty("mail.imap.ssl.enable", "true");
+        properties.setProperty("mail.imap.auth", "true");
         properties.setProperty("mail.debug", "false");
         ImapMailReceiver imapMailReceiver = new ImapMailReceiver(url);
         imapMailReceiver.setJavaMailProperties(properties);
@@ -48,12 +52,16 @@ public class MailConfig {
     public JavaMailSender mailSender(@Value("${mail.send.host}") String host, @Value("${mail.send.port}") int port, @Value("${mail.send.username}") String username, @Value("${mail.send.password}") String password) {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         Properties properties = new Properties();
-        properties.setProperty("mail.transport.protocol", "smtp");
+        properties.setProperty("mail.transport.protocol", "smtps");
+        properties.setProperty("mail.smtp.host", host);
+        properties.setProperty("mail.smtp.port", String.valueOf(port));
         properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        properties.setProperty("mail.smtp.socketFactory.port", "465");
-        properties.setProperty("mail.smtp.starttls.enable", "true");
+        properties.setProperty("mail.smtp.socketFactory.port", String.valueOf(port));
+        properties.setProperty("mail.smtp.ssl.enable", "true");
         properties.setProperty("mail.smtp.auth", "true");
         properties.setProperty("mail.debug", "false");
+        properties.setProperty("mail.user", username);
+        properties.setProperty("mail.password", password);
         javaMailSender.setJavaMailProperties(properties);
         javaMailSender.setProtocol("smtps");
         javaMailSender.setHost(host);

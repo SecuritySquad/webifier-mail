@@ -11,6 +11,8 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Component
 @MessageEndpoint
 public class MailReceiverService {
@@ -26,8 +28,8 @@ public class MailReceiverService {
     @ServiceActivator(inputChannel = "emailChannel")
     public void handleMessage(Message message) throws MessagingException, IOException {
         UrlsFromMessageExtractor extractor = new UrlsFromMessageExtractor();
-        List<String> urls = extractor.extractUrls(message);
-        MailRequest request = new MailRequest(MailData.from(message), sendService);
+        List<String> urls = extractor.extractUrls(message).stream().limit(5).collect(toList());
+        MailRequest request = new MailRequest(MailData.from(message), urls, sendService);
         urls.forEach(url -> launcher.launch(url, request));
     }
 }
