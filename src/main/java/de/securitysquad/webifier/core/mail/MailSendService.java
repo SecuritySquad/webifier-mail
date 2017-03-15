@@ -32,13 +32,11 @@ public class MailSendService {
 
     private final JavaMailSender mailSender;
     private final String from;
-    private Properties sendProperties;
 
     @Autowired
-    public MailSendService(JavaMailSender mailSender, @Value("${mail.outgoing.from}") String from, Properties sendProperties) {
+    public MailSendService(JavaMailSender mailSender, @Value("${mail.outgoing.from}") String from) {
         this.mailSender = mailSender;
         this.from = from;
-        this.sendProperties = sendProperties;
     }
 
     public void sendStartMail(MailData mailData, Map<String, Integer> queue) {
