@@ -68,6 +68,7 @@ public class WebifierTesterLauncher implements Runnable {
                 queue.stream().filter(exited).collect(toList()).forEach(t -> {
                     t.exit();
                     queue.remove(t);
+                    Runtime.getRuntime().gc();
                 });
                 if (queue.stream().mapToInt(t -> t.getState() == RUNNING ? 1 : 0).sum() < config.getParallel()) {
                     queue.stream().filter(waiting).min(comparingLong(WebifierTester::getCreationIndex)).ifPresent(WebifierTester::launch);
