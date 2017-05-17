@@ -46,7 +46,7 @@ public class WebifierTester {
         state = WebifierTesterState.RUNNING;
         testerThread = new Thread(() -> {
             try {
-                System.out.println(command);
+//                System.out.println(command);
                 testerProcess = Runtime.getRuntime().exec(command);
                 listenForInput(testerProcess.getInputStream());
                 testerProcess.waitFor(timeoutInMinutes, TimeUnit.MINUTES);
@@ -66,7 +66,7 @@ public class WebifierTester {
             try {
                 String line;
                 while ((line = br.readLine()) != null && !inputThread.isInterrupted()) {
-                    System.out.println(line);
+//                    System.out.println(line);
                     try {
                         WebifierTestResultData result = mapper.readValue(line, WebifierTestResultData.class);
                         switch (result.getTyp()) {

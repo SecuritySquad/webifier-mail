@@ -57,7 +57,7 @@ public class MailSendService {
     }
 
     public void sendResultMail(MailData mailData, Map<String, WebifierOverallTesterResult> urlResults) {
-        urlResults.forEach((s, webifierOverallTesterResult) -> System.out.println(s + " -> " + webifierOverallTesterResult.getResult()));
+//        urlResults.forEach((s, webifierOverallTesterResult) -> System.out.println(s + " -> " + webifierOverallTesterResult.getResult()));
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mailSender.createMimeMessage(), true, "utf-8");
             String textMessage = String.join("\n", urlResults.entrySet().stream().map(entry -> entry.getKey() + " -> " + getResultText(entry.getValue().getResult())).collect(toList()));
